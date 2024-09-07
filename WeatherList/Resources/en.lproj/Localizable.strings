@@ -1,0 +1,8 @@
+"WeatherListViewController.alertController.addItemTitle" = "Add Weather Item";
+"WeatherListViewController.alertController.addItemMessage" = "Enter title and content";
+"WeatherListViewController.alertController.addItemConfirm" = "Confirm";
+"WeatherListViewController.alertController.addItemCancel" = "Cancel";
+"WeatherListViewController.alertController.errorTitle" = "Error";
+"WeatherListViewController.alertController.errorRetry" = "Retry";
+"WeatherListViewController.alertController.errorDiscard" = "Discard";
+"WeatherListViewController.searchController.placeholder" = "Input settlement name";
