@@ -8,5 +8,5 @@
 import Foundation
 
 enum DesignSystemConstants {
-    static let standartPadding: CGFloat = 10
+    static let standartPadding: CGFloat = 16
 }

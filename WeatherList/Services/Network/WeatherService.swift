@@ -20,7 +20,9 @@ final class WeatherService: WeatherServiceProtocol {
     }
 
     func fetchWeatherFor(entities: [WeatherEntity], completion: @escaping (Result<[WeatherEntity], Error>) -> Void) {
-        currentTasks = []
+        if currentTasks.count > 0 {
+            currentTasks = []
+        }
         var fetchedEntities = [WeatherEntity]()
         let group = DispatchGroup()
         for entity in entities {
@@ -47,30 +49,31 @@ final class WeatherService: WeatherServiceProtocol {
         let taskString = "\(lat) \(lon)"
         if currentTasks.contains(taskString) {
             return
-        }
-        guard let request = urlRequestUsing(lat: lat, lon: lon) else {
-            completion(.failure(NetworkError.urlSessionError))
-            return
-        }
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<WeatherResponse,Error>) in
-            guard let self else { return }
-            switch result {
-            case .success(let result):
-                let entity = WeatherEntity(
-                    id: UUID(),
-                    title: result.name,
-                    lat: result.coord.lat,
-                    lon: result.coord.lon,
-                    temp: result.main.temp,
-                    icon: result.weather.first?.icon ?? ""
-                )
-                completion(.success(entity))
-            case .failure(let error):
-                completion(.failure(error))
+        } else {
+            guard let request = urlRequestUsing(lat: lat, lon: lon) else {
+                completion(.failure(NetworkError.urlSessionError))
+                return
             }
+            let task = urlSession.objectTask(for: request) { [weak self] (result: Result<WeatherResponse,Error>) in
+                guard let self else { return }
+                switch result {
+                case .success(let result):
+                    let entity = WeatherEntity(
+                        id: UUID(),
+                        title: result.name,
+                        lat: result.coord.lat,
+                        lon: result.coord.lon,
+                        temp: result.main.temp,
+                        icon: result.weather.first?.icon ?? ""
+                    )
+                    completion(.success(entity))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+            currentTasks.append(taskString)
+            task.resume()
         }
-        currentTasks.append(taskString)
-        task.resume()
     }
 }
 

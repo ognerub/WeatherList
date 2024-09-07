@@ -18,7 +18,7 @@ final class WeatherListViewController: UIViewController {
         return tableView
     }()
     lazy var addButton: UIBarButtonItem = {
-        let button = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
+        let button = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(addButtonPressed))
         return button
     }()
     private var weatherEntities: [WeatherEntity] = [] {
@@ -54,10 +54,10 @@ final class WeatherListViewController: UIViewController {
         tableView.dataSource = self
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: DesignSystemConstants.standartPadding),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -DesignSystemConstants.standartPadding),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         tableView.register(WeatherListTableViewCell.self, forCellReuseIdentifier: WeatherListTableViewCell.reuseIdentifier)
     }

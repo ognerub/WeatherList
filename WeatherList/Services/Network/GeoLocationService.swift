@@ -8,6 +8,7 @@ final class GeoLocationService: GeoLocationServiceProtocol {
 
     private let urlSession: URLSession
     private let builder: URLRequestBuilderProtocol
+    private var currentTask: URLSessionTask?
 
     init (
         urlSession: URLSession = .shared,
@@ -18,20 +19,24 @@ final class GeoLocationService: GeoLocationServiceProtocol {
     }
 
     func fetchGeoLocationUsing(search: String, completion: @escaping (Result<GeoLocation, Error>) -> Void) {
-        guard let request = urlRequestUsing(search: search) else {
-            completion(.failure(NetworkError.urlSessionError))
-            return
-        }
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<GeoLocation,Error>) in
-            guard let self else { return }
-            switch result {
-            case .success(let result):
-                completion(.success(result))
-            case .failure(let error):
-                completion(.failure(error))
+        print("called")
+        if currentTask != nil { print("canceled"); return } else {
+            guard let request = urlRequestUsing(search: search) else {
+                completion(.failure(NetworkError.urlSessionError))
+                return
             }
+            currentTask = urlSession.objectTask(for: request) { [weak self] (result: Result<GeoLocation,Error>) in
+                guard let self else { return }
+                self.currentTask = nil
+                switch result {
+                case .success(let result):
+                    completion(.success(result))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+            currentTask?.resume()
         }
-        task.resume()
     }
 }
 
