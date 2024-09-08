@@ -7,6 +7,7 @@ protocol WeatherDetailPresenterProtocol: AnyObject {
     // VIEW -> PRESENTER
     func viewDidLoad()
     func deleteWeather()
+    func retrieveForecastUsing(lat: String, lon: String)
 }
 
 class WeatherDetailPresenter: WeatherDetailPresenterProtocol {
@@ -20,6 +21,10 @@ class WeatherDetailPresenter: WeatherDetailPresenterProtocol {
         }
     }
 
+    func retrieveForecastUsing(lat: String, lon: String) {
+        interactor?.getForecastFor(lat: lat, lon: lon)
+    }
+
     func deleteWeather() {
         interactor?.deleteWeather()
     }
@@ -30,5 +35,9 @@ extension WeatherDetailPresenter: WeatherDetailInteractorOutputProtocol {
         if let view = view {
             router?.navigateBackToListViewController(from: view)
         }
+    }
+
+    func didRetrieveForecast(_ forecastEntity: ForecastEntity) {
+        view?.showForecast(forecastEntity)
     }
 }

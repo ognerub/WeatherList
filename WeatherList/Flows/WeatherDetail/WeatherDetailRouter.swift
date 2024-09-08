@@ -27,9 +27,4 @@ class WeatherDetailRouter: WeatherDetailRouterProtocol {
         presenter.router = router
         return weatherDetailVC
     }
-
-    static var storyboard: UIStoryboard {
-        return UIStoryboard(name: "Main", bundle: Bundle.main)
-    }
-
 }

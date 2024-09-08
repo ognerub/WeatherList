@@ -14,7 +14,7 @@ protocol WeatherListInteractorOutputProtocol: AnyObject {
     func didAddWeatherEntity(_ weatherEntity: WeatherEntity)
     func didRemoveWeatherEntity(_ weatherEntity: WeatherEntity)
     func didRetrieveWeatherEntities(_ weatherEntities: [WeatherEntity])
-    func onError(message: String)
+    func showAlert(message: String)
 }
 
 final class WeatherListInteractor: WeatherListInteractorInputProtocol {
@@ -29,19 +29,20 @@ final class WeatherListInteractor: WeatherListInteractorInputProtocol {
     }
 
     func retrieveWeatherEntitiesWithRefresh(_ bool: Bool) {
-        if bool {
-            weatherService.fetchWeatherFor(entities: weatherEntities, completion: { result in
+        if bool && weatherEntities.count > 0 {
+            weatherService.fetchWeatherFor(entities: weatherEntities) { result in
                 switch result {
                 case .success(let result):
                     if result.count > 0 {
                         self.weatherEntitiesStore.reloadWeatherEntities(result)
                         self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
+                        self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.successRefresh", comment: ""))
                     }
-                case .failure(let error):
-                    self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
-                    self.presenter?.onError(message: "Error while fetch weather \(error.localizedDescription)")
+                case .failure(_):
+                    //self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
+                    self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.errorRefresh", comment: ""))
                 }
-            })
+            }
         } else {
             self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
         }
@@ -67,10 +68,10 @@ final class WeatherListInteractor: WeatherListInteractorInputProtocol {
                     let lon = String(element.lon)
                     self.fetchSearched(lat: lat, lon: lon)
                 } else {
-                    self.presenter?.onError(message: "Ошибка в названии населенного пункта, попробуйте еще раз")
+                    self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.errorName", comment: ""))
                 }
             case .failure(let error):
-                self.presenter?.onError(message: "Ошибка сетевого запроса \(error.localizedDescription)")
+                self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.\(error)", comment: ""))
             }
         }
     }
@@ -81,7 +82,7 @@ final class WeatherListInteractor: WeatherListInteractorInputProtocol {
             case .success(let entity):
                 self.saveWeatherEntity(entity)
             case .failure(_):
-                return
+                self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.errorNetwork", comment: ""))
             }
         }
     }

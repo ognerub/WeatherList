@@ -4,7 +4,7 @@ typealias GeoLocation = [GeoLocationResponse]
 
 struct GeoLocationResponse: Codable {
     let name: String
-    let localNames: LocalNames
+    let localNames: LocalNames?
     let lat: Double
     let lon: Double
 }

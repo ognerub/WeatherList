@@ -28,6 +28,7 @@
 		81BE1C792C8CB02C007175F3 /* UIBlockingProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BE1C782C8CB02C007175F3 /* UIBlockingProgressHUD.swift */; };
 		81BE1C7B2C8CB7F5007175F3 /* GeoLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BE1C7A2C8CB7F5007175F3 /* GeoLocationService.swift */; };
 		81BE1C7D2C8CBA86007175F3 /* GeoLocationResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BE1C7C2C8CBA86007175F3 /* GeoLocationResponse.swift */; };
+		81BE1C802C8DD2CD007175F3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 81BE1C7F2C8DD2CD007175F3 /* Kingfisher */; };
 		81C88FBD2C7B7E0F0078C1E4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C88FBC2C7B7E0F0078C1E4 /* AppDelegate.swift */; };
 		81C88FC12C7B7E0F0078C1E4 /* WeatherListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C88FC02C7B7E0F0078C1E4 /* WeatherListViewController.swift */; };
 		81C88FC62C7B7E110078C1E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81C88FC52C7B7E110078C1E4 /* Assets.xcassets */; };
@@ -37,6 +38,9 @@
 		81C88FF32C7B81620078C1E4 /* WeatherListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C88FF22C7B81620078C1E4 /* WeatherListPresenter.swift */; };
 		81C88FF52C7B819F0078C1E4 /* WeatherLisInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C88FF42C7B819F0078C1E4 /* WeatherLisInteractor.swift */; };
 		81C88FF72C7B81BE0078C1E4 /* WeatherListRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C88FF62C7B81BE0078C1E4 /* WeatherListRouter.swift */; };
+		81F373542C8EFE0000DF0AF8 /* ForecastResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F373532C8EFE0000DF0AF8 /* ForecastResponse.swift */; };
+		81F373562C8F038400DF0AF8 /* ForecastSevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F373552C8F038400DF0AF8 /* ForecastSevice.swift */; };
+		81F373582C8F06B900DF0AF8 /* ForecastEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F373572C8F06B900DF0AF8 /* ForecastEntity.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +95,11 @@
 		81C88FF22C7B81620078C1E4 /* WeatherListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherListPresenter.swift; sourceTree = "<group>"; };
 		81C88FF42C7B819F0078C1E4 /* WeatherLisInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLisInteractor.swift; sourceTree = "<group>"; };
 		81C88FF62C7B81BE0078C1E4 /* WeatherListRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherListRouter.swift; sourceTree = "<group>"; };
+		81F373512C8EFC6D00DF0AF8 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		81F373522C8EFC6D00DF0AF8 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		81F373532C8EFE0000DF0AF8 /* ForecastResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastResponse.swift; sourceTree = "<group>"; };
+		81F373552C8F038400DF0AF8 /* ForecastSevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastSevice.swift; sourceTree = "<group>"; };
+		81F373572C8F06B900DF0AF8 /* ForecastEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastEntity.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81BE1C802C8DD2CD007175F3 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,8 +152,10 @@
 		81BE1C322C8C4680007175F3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				81C88FEC2C7B7F4E0078C1E4 /* WeatherEntity.swift */,
 				81BE1C742C8C659C007175F3 /* WeatherResponse.swift */,
+				81C88FEC2C7B7F4E0078C1E4 /* WeatherEntity.swift */,
+				81F373532C8EFE0000DF0AF8 /* ForecastResponse.swift */,
+				81F373572C8F06B900DF0AF8 /* ForecastEntity.swift */,
 				81BE1C7C2C8CBA86007175F3 /* GeoLocationResponse.swift */,
 				81BE1C642C8C55ED007175F3 /* NetworkError.swift */,
 			);
@@ -210,6 +222,7 @@
 				81BE1C662C8C56AD007175F3 /* NetworkConstants.swift */,
 				81BE1C712C8C6492007175F3 /* WeatherService.swift */,
 				81BE1C7A2C8CB7F5007175F3 /* GeoLocationService.swift */,
+				81F373552C8F038400DF0AF8 /* ForecastSevice.swift */,
 				81BE1C5F2C8C556B007175F3 /* URLRequestBuilder.swift */,
 			);
 			path = Network;
@@ -233,13 +246,6 @@
 				81BE1C6A2C8C57F9007175F3 /* WeatherDetailRouter.swift */,
 			);
 			path = WeatherDetail;
-			sourceTree = "<group>";
-		};
-		81BE1C732C8C6574007175F3 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		81C88FB02C7B7E0F0078C1E4 = {
@@ -269,7 +275,6 @@
 				81BE1C2D2C8C34F2007175F3 /* SceneDelegate.swift */,
 				81BE1C2F2C8C4121007175F3 /* Flows */,
 				81BE1C322C8C4680007175F3 /* Entities */,
-				81BE1C732C8C6574007175F3 /* Models */,
 				81BE1C362C8C4801007175F3 /* Services */,
 				81BE1C3D2C8C4FCE007175F3 /* Helpers */,
 				81BE1C372C8C4816007175F3 /* Resources */,
@@ -330,6 +335,9 @@
 			dependencies = (
 			);
 			name = WeatherList;
+			packageProductDependencies = (
+				81BE1C7F2C8DD2CD007175F3 /* Kingfisher */,
+			);
 			productName = ToDoList;
 			productReference = 81C88FB92C7B7E0F0078C1E4 /* WeatherList.app */;
 			productType = "com.apple.product-type.application";
@@ -364,8 +372,12 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 81C88FB02C7B7E0F0078C1E4;
+			packageReferences = (
+				81BE1C7E2C8DD2CD007175F3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+			);
 			productRefGroup = 81C88FBA2C7B7E0F0078C1E4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -441,12 +453,15 @@
 				81C88FBD2C7B7E0F0078C1E4 /* AppDelegate.swift in Sources */,
 				81BE1C2E2C8C34F2007175F3 /* SceneDelegate.swift in Sources */,
 				81BE1C6D2C8C57F9007175F3 /* WeatherDetailInteractor.swift in Sources */,
+				81F373582C8F06B900DF0AF8 /* ForecastEntity.swift in Sources */,
 				81BE1C632C8C55CF007175F3 /* String+Extensons.swift in Sources */,
 				81C88FED2C7B7F4E0078C1E4 /* WeatherEntity.swift in Sources */,
 				81C88FF72C7B81BE0078C1E4 /* WeatherListRouter.swift in Sources */,
 				81BE1C792C8CB02C007175F3 /* UIBlockingProgressHUD.swift in Sources */,
 				81BE1C752C8C659C007175F3 /* WeatherResponse.swift in Sources */,
 				81BE1C672C8C56AD007175F3 /* NetworkConstants.swift in Sources */,
+				81F373562C8F038400DF0AF8 /* ForecastSevice.swift in Sources */,
+				81F373542C8EFE0000DF0AF8 /* ForecastResponse.swift in Sources */,
 				81BE1C652C8C55ED007175F3 /* NetworkError.swift in Sources */,
 				81BE1C2C2C8C1F3A007175F3 /* WeatherListTableViewCell.swift in Sources */,
 				81BE1C6F2C8C57F9007175F3 /* WeatherDetailPresenter.swift in Sources */,
@@ -473,6 +488,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				81BE1C392C8C4E0A007175F3 /* en */,
+				81F373522C8EFC6D00DF0AF8 /* ru */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -481,6 +497,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				81C88FC82C7B7E110078C1E4 /* Base */,
+				81F373512C8EFC6D00DF0AF8 /* ru */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -583,6 +600,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -646,6 +664,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -803,6 +822,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		81BE1C7E2C8DD2CD007175F3 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		81BE1C7F2C8DD2CD007175F3 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81BE1C7E2C8DD2CD007175F3 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 81C88FB12C7B7E0F0078C1E4 /* Project object */;
 }

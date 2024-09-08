@@ -8,7 +8,8 @@ final class GeoLocationService: GeoLocationServiceProtocol {
 
     private let urlSession: URLSession
     private let builder: URLRequestBuilderProtocol
-    private var currentTask: URLSessionTask?
+    private let storage = WeatherEntitiesStore.shared
+    private var currentLoad: String?
 
     init (
         urlSession: URLSession = .shared,
@@ -19,30 +20,44 @@ final class GeoLocationService: GeoLocationServiceProtocol {
     }
 
     func fetchGeoLocationUsing(search: String, completion: @escaping (Result<GeoLocation, Error>) -> Void) {
-        print("called")
-        if currentTask != nil { print("canceled"); return } else {
-            guard let request = urlRequestUsing(search: search) else {
-                completion(.failure(NetworkError.urlSessionError))
-                return
-            }
-            currentTask = urlSession.objectTask(for: request) { [weak self] (result: Result<GeoLocation,Error>) in
-                guard let self else { return }
-                self.currentTask = nil
-                switch result {
-                case .success(let result):
-                    completion(.success(result))
-                case .failure(let error):
-                    completion(.failure(error))
-                }
-            }
-            currentTask?.resume()
+        if currentLoad != nil {
+            completion(.failure(NetworkError.urlSessionError))
+            return
         }
+        currentLoad = search
+        guard let request = urlRequestUsing(search: search) else {
+            completion(.failure(NetworkError.urlSessionError))
+            return
+        }
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<GeoLocation,Error>) in
+            guard let self else { return }
+            self.currentLoad = nil
+            switch result {
+            case .success(let result):
+                if result.count > 0 {
+                    guard let entity = result.first else {
+                        completion(.failure(NetworkError.errorName))
+                        return
+                    }
+                    if self.storage.weatherEntities.contains(where: { $0.lat.rounded() == entity.lat.rounded() && $0.lon.rounded() == entity.lon.rounded() } ) {
+                        completion(.failure(NetworkError.errorDublicate))
+                    } else {
+                        completion(.success(result))
+                    }
+                } else {
+                    completion(.failure(NetworkError.errorName))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+        task.resume()
     }
 }
 
 private extension GeoLocationService {
     func urlRequestUsing(search: String) -> URLRequest? {
-        let path: String = "/geo/1.0/direct"
+        let path: String = NetworkConstants.geoPath
         return builder.makeWeatherHTTPRequest(
             path: path,
             httpMethod: "GET",

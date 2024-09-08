@@ -8,5 +8,9 @@
 import Foundation
 
 enum DesignSystemConstants {
+    static let weatherCellSize: CGFloat = 100
     static let standartPadding: CGFloat = 16
+    static let textTitleSize: CGFloat = 17
+    static let customOrangeColor: String = "customOrange"
+    static let noIconImage: String = "noicon"
 }

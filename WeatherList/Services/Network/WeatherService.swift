@@ -7,9 +7,9 @@ protocol WeatherServiceProtocol: AnyObject {
 
 final class WeatherService: WeatherServiceProtocol {
 
+    private var currentTask: URLSessionTask?
     private let urlSession: URLSession
     private let builder: URLRequestBuilderProtocol
-    private var currentTasks = [String]()
 
     init (
         urlSession: URLSession = .shared,
@@ -20,16 +20,14 @@ final class WeatherService: WeatherServiceProtocol {
     }
 
     func fetchWeatherFor(entities: [WeatherEntity], completion: @escaping (Result<[WeatherEntity], Error>) -> Void) {
-        if currentTasks.count > 0 {
-            currentTasks = []
-        }
         var fetchedEntities = [WeatherEntity]()
         let group = DispatchGroup()
         for entity in entities {
             group.enter()
             let lat = String(entity.lat)
             let lon = String(entity.lon)
-            fetchWeatherFor(lat: lat, lon: lon, completion: { result in
+            usleep (1000000/2)
+            self.fetchWeatherFor(lat: lat, lon: lon) { result in
                 switch result {
                 case .success(let entity):
                     fetchedEntities.append(entity)
@@ -37,49 +35,41 @@ final class WeatherService: WeatherServiceProtocol {
                     completion(.failure(error))
                 }
                 group.leave()
-            })
+            }
         }
         group.notify(queue: .main) {
-            let sortedEntities = fetchedEntities.sorted { $0.title < $1.title }
-            completion(.success(sortedEntities))
+            completion(.success(fetchedEntities))
         }
     }
 
     func fetchWeatherFor(lat: String, lon: String, completion: @escaping (Result<WeatherEntity, Error>) -> Void) {
-        let taskString = "\(lat) \(lon)"
-        if currentTasks.contains(taskString) {
+        guard let request = urlRequestUsing(lat: lat, lon: lon) else {
+            completion(.failure(NetworkError.urlSessionError))
             return
-        } else {
-            guard let request = urlRequestUsing(lat: lat, lon: lon) else {
-                completion(.failure(NetworkError.urlSessionError))
-                return
-            }
-            let task = urlSession.objectTask(for: request) { [weak self] (result: Result<WeatherResponse,Error>) in
-                guard let self else { return }
-                switch result {
-                case .success(let result):
-                    let entity = WeatherEntity(
-                        id: UUID(),
-                        title: result.name,
-                        lat: result.coord.lat,
-                        lon: result.coord.lon,
-                        temp: result.main.temp,
-                        icon: result.weather.first?.icon ?? ""
-                    )
-                    completion(.success(entity))
-                case .failure(let error):
-                    completion(.failure(error))
-                }
-            }
-            currentTasks.append(taskString)
-            task.resume()
         }
+        let task = urlSession.objectTask(for: request) { (result: Result<WeatherResponse,Error>) in
+            switch result {
+            case .success(let result):
+                let entity = WeatherEntity(
+                    id: UUID(),
+                    title: result.name,
+                    lat: result.coord.lat,
+                    lon: result.coord.lon,
+                    temp: (result.main.temp - 273.15).rounded(),
+                    icon: result.weather.first?.icon ?? ""
+                )
+                completion(.success(entity))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+        task.resume()
     }
 }
 
 private extension WeatherService {
     func urlRequestUsing(lat: String, lon: String) -> URLRequest? {
-        let path: String = "/data/2.5/weather?"
+        let path: String = NetworkConstants.weatherPath
         return builder.makeWeatherHTTPRequest(
             path: path,
             httpMethod: "GET",

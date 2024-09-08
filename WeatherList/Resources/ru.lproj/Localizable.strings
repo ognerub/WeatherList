@@ -1,0 +1,12 @@
+"WeatherListViewController.alertController.addItemConfirm" = "Подтвердить";
+"WeatherListViewController.alertController.addItemCancel" = "Отмена";
+"WeatherListViewController.alertController.title" = "Системное сообщение";
+"WeatherListViewController.alertController.errorRetry" = "Повторить";
+"WeatherListViewController.alertController.errorClose" = "Закрыть";
+"WeatherListInteractor.alertController.errorName" = "Ошибка в названии населенного пункта, попробуйте еще раз";
+"WeatherListInteractor.alertController.errorNetwork" = "Ошибка сети";
+"WeatherListInteractor.alertController.urlRequestError" = "Ошибка сетевого запроса";
+"WeatherListInteractor.alertController.errorRefresh" = "Ошибка обновления погоды";
+"WeatherListInteractor.alertController.errorDublicate" = "Населенный пункт уже есть в списке";
+"WeatherListInteractor.alertController.successRefresh" = "Погода успешно обновлена";
+"WeatherListViewController.searchController.placeholder" = "Введите населенный пункт";

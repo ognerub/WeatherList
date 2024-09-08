@@ -1,27 +1,33 @@
 import UIKit
 
 protocol WeatherPresenterProtocol: AnyObject {
-    var view: WeatherViewProtocol? { get set }
+    var view: WeatherListViewProtocol? { get set }
     var interactor: WeatherListInteractorInputProtocol? { get set }
     var router: WeatherListRouterProtocol? { get set }
     // VIEW -> PRESENTER
-    func startUpdateData()
-    func retrieveGeoLocationUsing(search: String)
+    func showTodoDetail(_ weatherEntity: WeatherEntity)
     func addWeatherEntity(_ weatherEntity: WeatherEntity)
+    func startUpdateDataWithRefresh(_ bool: Bool)
+    func retrieveGeoLocationUsing(search: String)
     func removeWeatherEntity(_ weatherEntity: WeatherEntity)
 }
 
 final class WeatherListPresenter: WeatherPresenterProtocol {
-    weak var view: WeatherViewProtocol?
+    weak var view: WeatherListViewProtocol?
     var interactor: WeatherListInteractorInputProtocol?
     var router: WeatherListRouterProtocol?
-    
+
+    func showTodoDetail(_ entity: WeatherEntity) {
+        guard let view = view else { return }
+        router?.presentWeatherDetailScreen(from: view, for: entity)
+    }
+
     func addWeatherEntity(_ weatherEntity: WeatherEntity) {
         interactor?.saveWeatherEntity(weatherEntity)
     }
     
-    func startUpdateData() {
-        interactor?.retrieveWeatherEntitiesWithRefresh(true)
+    func startUpdateDataWithRefresh(_ bool: Bool) {
+        interactor?.retrieveWeatherEntitiesWithRefresh(bool)
     }
 
     func retrieveGeoLocationUsing(search: String) {
@@ -42,8 +48,8 @@ extension WeatherListPresenter: WeatherListInteractorOutputProtocol {
         view?.showWeather(weatherEntities)
     }
     
-    func onError(message: String) {
-        view?.showErrorMessage(message)
+    func showAlert(message: String) {
+        view?.showMessage(message)
     }
     
     func didRemoveWeatherEntity(_ weatherEntity: WeatherEntity) {

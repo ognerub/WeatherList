@@ -1,8 +1,12 @@
-"WeatherListViewController.alertController.addItemTitle" = "Add Weather Item";
-"WeatherListViewController.alertController.addItemMessage" = "Enter title and content";
 "WeatherListViewController.alertController.addItemConfirm" = "Confirm";
 "WeatherListViewController.alertController.addItemCancel" = "Cancel";
-"WeatherListViewController.alertController.errorTitle" = "Error";
+"WeatherListViewController.alertController.title" = "System Message";
 "WeatherListViewController.alertController.errorRetry" = "Retry";
-"WeatherListViewController.alertController.errorDiscard" = "Discard";
-"WeatherListViewController.searchController.placeholder" = "Input settlement name";
+"WeatherListViewController.alertController.errorClose" = "Close";
+"WeatherListInteractor.alertController.errorName" = "Error in the name of the locality, try again";
+"WeatherListInteractor.alertController.errorNetwork" = "Network error";
+"WeatherListInteractor.alertController.urlRequestError" = "Network request error";
+"WeatherListInteractor.alertController.errorRefresh" = "Weather update error";
+"WeatherListInteractor.alertController.errorDublicate" = "The locality is already in the list";
+"WeatherListInteractor.alertController.successRefresh" = "Weather updated successfully";
+"WeatherListViewController.searchController.placeholder" = "Enter settlement";

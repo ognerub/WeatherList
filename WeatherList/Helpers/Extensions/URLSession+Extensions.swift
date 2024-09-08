@@ -28,7 +28,7 @@ extension URLSession {
                     completion(.failure(NetworkError.httpStatusCode(statusCode)))
                 }
             } else if let error = error {
-                fullFillCompletionOnMainThread(.failure(NetworkError.urlRequestError(error)))
+                fullFillCompletionOnMainThread(.failure(NetworkError.urlRequestError))
             } else {
                 fullFillCompletionOnMainThread(.failure(NetworkError.urlSessionError))
             }
