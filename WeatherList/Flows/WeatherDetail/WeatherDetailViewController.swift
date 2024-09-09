@@ -27,7 +27,6 @@ class WeatherDetailViewController: UIViewController {
     lazy var subtitleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
-        label.text = "forecast"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -35,6 +34,7 @@ class WeatherDetailViewController: UIViewController {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.allowsSelection = false
         return tableView
     }()
     lazy var weatherImageView: UIImageView = {
@@ -50,6 +50,7 @@ class WeatherDetailViewController: UIViewController {
         return button
     }()
     var presenter: WeatherDetailPresenterProtocol?
+    private let dateFormatter = DateFormatterService()
     private var weatherEntity: WeatherEntity? {
         didSet {
             guard let weatherEntity = weatherEntity else { return }
@@ -58,7 +59,7 @@ class WeatherDetailViewController: UIViewController {
             presenter?.retrieveForecastUsing(lat: lat, lon: lon)
         }
     }
-    private var dayForecasts: [DayForecast] = [DayForecast(temp: 0.0, date: "Loading forecast...")] {
+    private var dayForecasts: [DayForecast] = [] {
         didSet {
             self.tableView.reloadData()
         }
@@ -102,7 +103,7 @@ class WeatherDetailViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: roundedView.trailingAnchor, constant: -DesignSystemConstants.standartPadding),
             tableView.bottomAnchor.constraint(equalTo: roundedView.bottomAnchor, constant: -DesignSystemConstants.standartPadding)
         ])
-        tableView.register(WeatherListTableViewCell.self, forCellReuseIdentifier: WeatherListTableViewCell.reuseIdentifier)
+        tableView.register(WeatherDetailTableViewCell.self, forCellReuseIdentifier: WeatherDetailTableViewCell.reuseIdentifier)
     }
 
     @objc
@@ -122,13 +123,19 @@ extension WeatherDetailViewController: UITableViewDataSource {
         dayForecasts.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        let entityTemp = Int(dayForecasts[indexPath.row].temp)
-        let entityTempString = entityTemp > 0 ? "+ \(entityTemp)" : "\(entityTemp)"
-        cell.textLabel?.text = "\(dayForecasts[indexPath.row].date) : \(entityTempString)"
-        cell.textLabel?.textColor = .black
-        cell.backgroundColor = .clear
-        return cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: WeatherDetailTableViewCell.reuseIdentifier, for: indexPath)
+        guard let tableViewCell = cell as? WeatherDetailTableViewCell else {
+            return UITableViewCell()
+        }
+        let weatherForecast = dayForecasts[indexPath.row]
+        let entityForecast = Int(weatherForecast.temp)
+        let entityDate = dateFormatter.getString(from: weatherForecast.date)
+        tableViewCell.configureCell(
+            with: entityDate,
+            subtitle: entityForecast > 0 ? "+ \(entityForecast)" : "\(entityForecast)"
+        )
+        downloadImageFor(cell: tableViewCell, at: indexPath)
+        return tableViewCell
     }
 }
 
@@ -164,6 +171,28 @@ extension WeatherDetailViewController: WeatherDetailViewProtocol {
                 self.weatherImageView.contentMode = .scaleAspectFill
             case .failure(_):
                 self.weatherImageView.image = UIImage(named: DesignSystemConstants.noIconImage)
+            }
+        }
+    }
+}
+
+private extension WeatherDetailViewController {
+    func downloadImageFor(cell: WeatherDetailTableViewCell, at indexPath: IndexPath) {
+        let url = "\(NetworkConstants.imageUrl)\(dayForecasts[indexPath.row].icon)@2x.png"
+        let processor = DownsamplingImageProcessor(size: CGSize(width: DesignSystemConstants.weatherCellSize, height: DesignSystemConstants.weatherCellSize))
+        cell.weatherImageView.kf.indicatorType = .activity
+        cell.weatherImageView.kf.setImage(
+            with: URL(string: url),
+            placeholder: UIImage(),
+            options: [
+                .processor(processor)
+            ]
+        ) { result in
+            switch result {
+            case .success(_):
+                cell.weatherImageView.contentMode = .scaleAspectFill
+            case .failure(_):
+                cell.weatherImageView.image = UIImage(named: DesignSystemConstants.noIconImage)
             }
         }
     }

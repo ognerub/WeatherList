@@ -48,7 +48,10 @@ final class ForecastService: ForecastServiceProtocol {
                     forecast: result.list.compactMap { list in
                         DayForecast(
                             temp: (list.main.temp - 273.15).rounded(),
-                            date: list.dtTxt
+                            date: list.dtTxt,
+                            icon: list.weather.compactMap { weather in
+                                return weather.icon
+                            }.first ?? ""
                         )
                     }
                 )
