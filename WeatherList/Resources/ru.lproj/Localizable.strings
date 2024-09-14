@@ -1,3 +1,4 @@
+"WeatherListViewController.titleLabel.infoText" = "Добавьте город";
 "WeatherListViewController.alertController.addItemConfirm" = "Подтвердить";
 "WeatherListViewController.alertController.addItemCancel" = "Отмена";
 "WeatherListViewController.alertController.title" = "Системное сообщение";
@@ -10,3 +11,5 @@
 "WeatherListInteractor.alertController.errorDublicate" = "Населенный пункт уже есть в списке";
 "WeatherListInteractor.alertController.successRefresh" = "Погода успешно обновлена";
 "WeatherListViewController.searchController.placeholder" = "Введите населенный пункт";
+"WeatherDetailViewController.alertController.askForDelete" = "Вы действительно хотите удалить этот населенный пункт из списка погоды?";
+"WeatherDetailViewController.alertController.deleteItem" = "Удалить";

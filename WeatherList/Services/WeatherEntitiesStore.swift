@@ -1,30 +1,111 @@
 import Foundation
+import RealmSwift
 
-final class WeatherEntitiesStore {
-    private init() {}
-    public static let shared = WeatherEntitiesStore()
-    public private(set) var weatherEntities: [WeatherEntity] = [
-//        WeatherEntity(id: UUID(), title: "Kazan", lat: 55.7823547, lon: 49.1242266, temp: 26.05, icon: "02d"),
-        WeatherEntity(id: UUID(), title: "Moscow", lat: 55.7504461, lon: 37.6174943, temp: 24.02, icon: "01d"),
-        WeatherEntity(id: UUID(), title: "Krasnodar", lat: 45.0353, lon: 38.9765, temp: 27.97, icon: "10d"),
-        WeatherEntity(id: UUID(), title: "Sochi", lat: 43.5855, lon: 39.7231, temp: 28.69, icon: "04d")
-//        WeatherEntity(id: UUID(), title: "Klin", lat: 56.3356, lon: 36.7351, temp: 23.16, icon: "01d"),
-//        WeatherEntity(id: UUID(), title: "Murmansk", lat: 68.9707, lon: 33.075, temp: 10.55, icon: "03d"),
-//        WeatherEntity(id: UUID(), title: "Tiksi", lat: 71.6366, lon: 128.8685, temp: 0.0, icon: "10d"),
-//        WeatherEntity(id: UUID(), title: "Vladivostok", lat: 43.1151, lon: 131.8856, temp: 22.54, icon: "01d")
-    ]
+protocol WeatherEntitiesStoreProtocol: AnyObject {
+    func reloadWeatherEntities(_ entities: [WeatherEntity])
+    func addWeatherEntity(_ entity: WeatherEntity)
+    func removeWeatherEntity(_ entity: WeatherEntity)
+    func getEntitiesFromRealm() -> [WeatherEntity]
+}
 
-    func reloadWeatherEntities(_ weatherEntities: [WeatherEntity]) {
-        self.weatherEntities = weatherEntities
+final class WeatherEntitiesStore: WeatherEntitiesStoreProtocol {
+    @ObservedResults(RealmWeatherEntity.self) var realmWeatherEntities
+
+    func reloadWeatherEntities(_ entities: [WeatherEntity]) {
+        deleteAllFromRealm()
+        writeToRealm(entites: entities.reversed())
     }
 
-    func addWeatherEntity(_ weatherEntity: WeatherEntity) {
-        weatherEntities.insert(weatherEntity, at: 0)
+    func addWeatherEntity(_ entity: WeatherEntity) {
+        writeToRealm(entity: entity)
     }
 
-    func removeWeatherEntity(_ weatherEntity: WeatherEntity) {
-        if let index = weatherEntities.firstIndex(where: { $0.id == weatherEntity.id }) {
-            weatherEntities.remove(at: index)
+    func removeWeatherEntity(_ entity: WeatherEntity) {
+        deleteFromRealm(entity: entity)
+    }
+
+    func getEntitiesFromRealm() -> [WeatherEntity] {
+        if checkIsRealmEmpty() {
+            return []
+        } else {
+            return self.realmWeatherEntities.compactMap { value in
+                let weatherEntity = WeatherEntity(
+                    id: UUID(),
+                    title: value.title,
+                    lat: value.lat,
+                    lon: value.lon,
+                    temp: value.temp,
+                    icon: value.icon
+                )
+                return weatherEntity
+            }
         }
+    }
+
+    private func writeToRealm(entites: [WeatherEntity]) {
+        entites.forEach { value in
+            writeToRealm(entity: value)
+        }
+    }
+
+    private func writeToRealm(entity: WeatherEntity) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let realmWeatherEntity = createRealmWeatherEntity(from: entity)
+                realm.add(realmWeatherEntity)
+            }
+        } catch {
+            print("error write entity to Realm: \(error)")
+        }
+    }
+
+    private func deleteAllFromRealm() {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                realm.deleteAll()
+            }
+        } catch {
+            print("Realm delete all error: \(error)")
+        }
+    }
+
+    private func deleteFromRealm(entity: WeatherEntity) {
+        do {
+            let realm = try Realm()
+            let realmWeatherEntities = realm.objects(RealmWeatherEntity.self)
+            let entityToDelete = realmWeatherEntities.first(where: { $0.lat == entity.lat && $0.lon == entity.lon } )
+            guard let entityToDelete = entityToDelete else { return }
+            try realm.write {
+                realm.delete(entityToDelete)
+            }
+        } catch {
+            print("Realm delete \(entity.title) error: \(error)")
+        }
+    }
+
+    private func checkIsRealmEmpty() -> Bool {
+        var isRealmEmpty = true
+        do {
+            let realm = try Realm()
+            let realmWeatherEntities = realm.objects(RealmWeatherEntity.self)
+            if realmWeatherEntities.count > 0 {
+                isRealmEmpty = false
+            }
+        } catch {
+            print("Realm read error: \(error)")
+        }
+        return isRealmEmpty
+    }
+
+    private func createRealmWeatherEntity(from entity: WeatherEntity) -> RealmWeatherEntity {
+        return RealmWeatherEntity(
+            title: entity.title,
+            lat: entity.lat,
+            lon: entity.lon,
+            temp: entity.temp,
+            icon: entity.icon
+        )
     }
 }

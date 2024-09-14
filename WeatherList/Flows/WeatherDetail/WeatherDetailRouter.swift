@@ -19,7 +19,7 @@ class WeatherDetailRouter: WeatherDetailRouterProtocol {
         let presenter: WeatherDetailPresenter & WeatherDetailInteractorOutputProtocol = WeatherDetailPresenter()
         weatherDetailVC.presenter = presenter
         presenter.view = weatherDetailVC
-        let interactor: WeatherDetailInteractorInputProtocol = WeatherDetailInteractor()
+        let interactor: WeatherDetailInteractorInputProtocol = WeatherDetailInteractor(weatherEntitiesStore: WeatherEntitiesStore())
         interactor.weatherItem = weather
         interactor.presenter = presenter
         presenter.interactor = interactor

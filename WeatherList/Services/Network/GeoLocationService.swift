@@ -1,4 +1,5 @@
 import Foundation
+import RealmSwift
 
 protocol GeoLocationServiceProtocol: AnyObject {
     func fetchGeoLocationUsing(search: String, completion: @escaping (Result<GeoLocation, Error>) -> Void)
@@ -6,9 +7,10 @@ protocol GeoLocationServiceProtocol: AnyObject {
 
 final class GeoLocationService: GeoLocationServiceProtocol {
 
+    @ObservedResults(RealmWeatherEntity.self) var realmWeatherEntities
+
     private let urlSession: URLSession
     private let builder: URLRequestBuilderProtocol
-    private let storage = WeatherEntitiesStore.shared
     private var currentLoad: String?
 
     init (
@@ -39,7 +41,7 @@ final class GeoLocationService: GeoLocationServiceProtocol {
                         completion(.failure(NetworkError.errorName))
                         return
                     }
-                    if self.storage.weatherEntities.contains(where: { $0.lat.rounded() == entity.lat.rounded() && $0.lon.rounded() == entity.lon.rounded() } ) {
+                    if self.realmWeatherEntities.contains(where: { $0.lat.rounded() == entity.lat.rounded() && $0.lon.rounded() == entity.lon.rounded() } ) {
                         completion(.failure(NetworkError.errorDublicate))
                     } else {
                         completion(.success(result))

@@ -1,3 +1,4 @@
+"WeatherListViewController.titleLabel.infoText" = "Add settlment";
 "WeatherListViewController.alertController.addItemConfirm" = "Confirm";
 "WeatherListViewController.alertController.addItemCancel" = "Cancel";
 "WeatherListViewController.alertController.title" = "System Message";
@@ -10,3 +11,5 @@
 "WeatherListInteractor.alertController.errorDublicate" = "The locality is already in the list";
 "WeatherListInteractor.alertController.successRefresh" = "Weather updated successfully";
 "WeatherListViewController.searchController.placeholder" = "Enter settlement";
+"WeatherDetailViewController.alertController.askForDelete" = "Do you really want to delete this settlement from weather list";
+"WeatherDetailViewController.alertController.deleteItem" = "Delete";

@@ -37,7 +37,11 @@ extension WeatherDetailPresenter: WeatherDetailInteractorOutputProtocol {
         }
     }
 
-    func didRetrieveForecast(_ forecastEntity: ForecastEntity) {
-        view?.showForecast(forecastEntity)
+    func showAlert(message: String) {
+        view?.showMessage(message)
+    }
+
+    func didRetrieveForecasts(_ forecasts: [[DayForecast]]) {
+        view?.showForecasts(forecasts)
     }
 }

@@ -11,7 +11,7 @@ final class WeatherListRouter: WeatherListRouterProtocol {
         let navController = UINavigationController(rootViewController: WeatherListViewController())
         guard let weatherListViewController = navController.topViewController as? WeatherListViewController else { fatalError("Invalid View Controller") }
         let presenter: WeatherPresenterProtocol & WeatherListInteractorOutputProtocol = WeatherListPresenter()
-        let interactor: WeatherListInteractorInputProtocol = WeatherListInteractor()
+        let interactor: WeatherListInteractorInputProtocol = WeatherListInteractor(weatherEntitiesStore: WeatherEntitiesStore())
         let router = WeatherListRouter()
         weatherListViewController.presenter = presenter
         presenter.view = weatherListViewController

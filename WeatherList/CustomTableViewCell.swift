@@ -1,7 +1,8 @@
 import UIKit
+import Kingfisher
 
-final class WeatherListTableViewCell: UITableViewCell {
-    static let reuseIdentifier = "WeatherListTableViewCell"
+final class CustomTableViewCell: UITableViewCell {
+    static let reuseIdentifier = "CustomTableViewCell"
     lazy var roundedView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemGray5
@@ -51,6 +52,25 @@ final class WeatherListTableViewCell: UITableViewCell {
         subtitleLabel.text = subtitle
     }
 
+    static func downloadImageFor(imageView: UIImageView, from url: String) {
+        let processor = DownsamplingImageProcessor(size: CGSize(width: DesignSystemConstants.weatherCellSize, height: DesignSystemConstants.weatherCellSize))
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(
+            with: URL(string: url),
+            placeholder: UIImage(),
+            options: [
+                .processor(processor)
+            ]
+        ) { result in
+            switch result {
+            case .success(_):
+                imageView.contentMode = .scaleAspectFill
+            case .failure(_):
+                imageView.image = UIImage(named: DesignSystemConstants.noIconImage)
+            }
+        }
+    }
+
     private func configureUI() {
         self.backgroundColor = .clear
         self.addSubview(roundedView)
@@ -62,7 +82,7 @@ final class WeatherListTableViewCell: UITableViewCell {
             roundedView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             roundedView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: DesignSystemConstants.standartPadding),
             roundedView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignSystemConstants.standartPadding),
-            titleLabel.centerYAnchor.constraint(equalTo: roundedView.centerYAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: roundedView.leadingAnchor, constant: DesignSystemConstants.standartPadding),
             weatherImageView.trailingAnchor.constraint(equalTo: roundedView.trailingAnchor),
             weatherImageView.centerYAnchor.constraint(equalTo: roundedView.topAnchor),

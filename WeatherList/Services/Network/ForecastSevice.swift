@@ -15,7 +15,6 @@ final class ForecastService: ForecastServiceProtocol {
 
     private let urlSession: URLSession
     private let builder: URLRequestBuilderProtocol
-    private let storage = WeatherEntitiesStore.shared
     private var currentTask: URLSessionTask?
 
     init (

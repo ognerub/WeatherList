@@ -1,14 +1,15 @@
 import UIKit
-import Kingfisher
 
 protocol WeatherDetailViewProtocol: AnyObject {
     var presenter: WeatherDetailPresenterProtocol? { get set }
     // PRESENTER -> VIEW
     func showWeather(_ weather: WeatherEntity)
-    func showForecast(_ forecast: ForecastEntity)
+    func showForecasts(_ forecasts: [[DayForecast]])
+    func showMessage(_ message: String)
 }
 
-class WeatherDetailViewController: UIViewController {
+final class WeatherDetailViewController: UIViewController {
+    // MARK: Properties
     lazy var roundedView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemGray5
@@ -31,7 +32,7 @@ class WeatherDetailViewController: UIViewController {
         return label
     }()
     lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.backgroundColor = .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.allowsSelection = false
@@ -51,6 +52,8 @@ class WeatherDetailViewController: UIViewController {
     }()
     var presenter: WeatherDetailPresenterProtocol?
     private let dateFormatter = DateFormatterService()
+    private var activityLoader: UIBlockingProgressHUD?
+    private var alertPresenter: AlertPresenterProtocol?
     private var weatherEntity: WeatherEntity? {
         didSet {
             guard let weatherEntity = weatherEntity else { return }
@@ -59,17 +62,20 @@ class WeatherDetailViewController: UIViewController {
             presenter?.retrieveForecastUsing(lat: lat, lon: lon)
         }
     }
-    private var dayForecasts: [DayForecast] = [] {
+    private var dayForecasts: [[DayForecast]] = [] {
         didSet {
             self.tableView.reloadData()
         }
     }
 
+    // MARK: Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        activityLoader = UIBlockingProgressHUD(viewController: self)
+        alertPresenter = AlertPresenterImpl(viewController: self)
         setupUI()
-        setupTableView()
+        activityLoader?.show()
         presenter?.viewDidLoad()
     }
 
@@ -91,6 +97,7 @@ class WeatherDetailViewController: UIViewController {
             subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: DesignSystemConstants.standartPadding),
             subtitleLabel.centerXAnchor.constraint(equalTo: titleLabel.centerXAnchor)
         ])
+        setupTableView()
     }
 
     private func setupTableView() {
@@ -99,101 +106,118 @@ class WeatherDetailViewController: UIViewController {
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: DesignSystemConstants.standartPadding),
-            tableView.leadingAnchor.constraint(equalTo: roundedView.leadingAnchor, constant: DesignSystemConstants.standartPadding),
-            tableView.trailingAnchor.constraint(equalTo: roundedView.trailingAnchor, constant: -DesignSystemConstants.standartPadding),
+            tableView.leadingAnchor.constraint(equalTo: roundedView.leadingAnchor, constant: 0),
+            tableView.trailingAnchor.constraint(equalTo: roundedView.trailingAnchor, constant: 0),
             tableView.bottomAnchor.constraint(equalTo: roundedView.bottomAnchor, constant: -DesignSystemConstants.standartPadding)
         ])
-        tableView.register(WeatherDetailTableViewCell.self, forCellReuseIdentifier: WeatherDetailTableViewCell.reuseIdentifier)
+        tableView.register(CustomTableViewHeader.self, forHeaderFooterViewReuseIdentifier: CustomTableViewHeader.reuseIdentifier)
+        tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: CustomTableViewCell.reuseIdentifier)
     }
 
     @objc
     func deleteButtonPressed() {
-        presenter?.deleteWeather()
+        alertPresenter?.show(
+            with: AlertModel(
+                title: NSLocalizedString("WeatherListViewController.alertController.title", comment: ""),
+                message: NSLocalizedString("WeatherDetailViewController.alertController.askForDelete", comment: ""),
+                firstButton: NSLocalizedString("WeatherDetailViewController.alertController.deleteItem", comment: ""),
+                secondButton: NSLocalizedString("WeatherListViewController.alertController.addItemCancel", comment: ""),
+                firstCompletion: { self.presenter?.deleteWeather() },
+                secondCompletion: { }
+            ), style: .destructive
+        )
     }
 }
 
+//MARK: - UITableViewDelegate
 extension WeatherDetailViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         DesignSystemConstants.weatherCellSize
     }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        DesignSystemConstants.weatherCellSize / 2
+    }
 }
 
+// MARK: - UITableViewDataSource
 extension WeatherDetailViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        dayForecasts.count
+
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return dayForecasts.count
     }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CustomTableViewHeader.reuseIdentifier)
+        guard let tableViewHeader = header as? CustomTableViewHeader else {
+            return UITableViewHeaderFooterView()
+        }
+        tableViewHeader.configureHeader(with: createHeaderDate(for: section) ?? "")
+        return tableViewHeader
+    }
+
+    private func createHeaderDate(for section: Int) -> String? {
+        guard let date = dayForecasts[section].first?.date else { return nil }
+        let stringDate = dateFormatter.getString(from: date)
+        let time = stringDate.suffix(5)
+        let onlyDate = String(stringDate.replacingOccurrences(of: time, with: ""))
+        return onlyDate
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return dayForecasts[section].count
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: WeatherDetailTableViewCell.reuseIdentifier, for: indexPath)
-        guard let tableViewCell = cell as? WeatherDetailTableViewCell else {
+        let cell = tableView.dequeueReusableCell(withIdentifier: CustomTableViewCell.reuseIdentifier, for: indexPath)
+        guard let tableViewCell = cell as? CustomTableViewCell else {
             return UITableViewCell()
         }
-        let weatherForecast = dayForecasts[indexPath.row]
+        configure(cell: tableViewCell, for: indexPath)
+        return tableViewCell
+    }
+
+    private func configure(cell: CustomTableViewCell, for indexPath: IndexPath) {
+        let weatherForecast = dayForecasts[indexPath.section][indexPath.row]
         let entityForecast = Int(weatherForecast.temp)
-        let entityDate = dateFormatter.getString(from: weatherForecast.date)
-        tableViewCell.configureCell(
+        let entityDate = String(dateFormatter.getString(from: weatherForecast.date).suffix(5))
+        cell.configureCell(
             with: entityDate,
             subtitle: entityForecast > 0 ? "+ \(entityForecast)" : "\(entityForecast)"
         )
-        downloadImageFor(cell: tableViewCell, at: indexPath)
-        return tableViewCell
+        let url = "\(NetworkConstants.imageUrl)\(weatherForecast.icon)@2x.png"
+        CustomTableViewCell.downloadImageFor(imageView: cell.weatherImageView, from: url)
     }
 }
 
+// MARK: - WeatherDetailViewProtocol
 extension WeatherDetailViewController: WeatherDetailViewProtocol {
 
     func showWeather(_ entity: WeatherEntity) {
-        self.weatherEntity = entity
+        weatherEntity = entity
         titleLabel.text = entity.title
         let entityTemp = Int(entity.temp)
         subtitleLabel.text = entityTemp > 0 ? "+ \(entityTemp)" : "\(entityTemp)"
-        downloadImageFor(entity: entity)
-    }
-
-    func showForecast(_ forecast: ForecastEntity) {
-        let dayForecasts = forecast.forecast.compactMap { $0 }
-        self.dayForecasts = dayForecasts
-    }
-
-    private func downloadImageFor(entity: WeatherEntity) {
         let url = "\(NetworkConstants.imageUrl)\(entity.icon)@2x.png"
-        let processor = DownsamplingImageProcessor(size: CGSize(width: DesignSystemConstants.weatherCellSize, height: DesignSystemConstants.weatherCellSize))
-        weatherImageView.kf.indicatorType = .activity
-        weatherImageView.kf.setImage(
-            with: URL(string: url),
-            placeholder: UIImage(),
-            options: [
-                .processor(processor)
-            ]
-        ) { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(_):
-                self.weatherImageView.contentMode = .scaleAspectFill
-            case .failure(_):
-                self.weatherImageView.image = UIImage(named: DesignSystemConstants.noIconImage)
-            }
-        }
+        CustomTableViewCell.downloadImageFor(imageView: weatherImageView, from: url)
     }
-}
 
-private extension WeatherDetailViewController {
-    func downloadImageFor(cell: WeatherDetailTableViewCell, at indexPath: IndexPath) {
-        let url = "\(NetworkConstants.imageUrl)\(dayForecasts[indexPath.row].icon)@2x.png"
-        let processor = DownsamplingImageProcessor(size: CGSize(width: DesignSystemConstants.weatherCellSize, height: DesignSystemConstants.weatherCellSize))
-        cell.weatherImageView.kf.indicatorType = .activity
-        cell.weatherImageView.kf.setImage(
-            with: URL(string: url),
-            placeholder: UIImage(),
-            options: [
-                .processor(processor)
-            ]
-        ) { result in
-            switch result {
-            case .success(_):
-                cell.weatherImageView.contentMode = .scaleAspectFill
-            case .failure(_):
-                cell.weatherImageView.image = UIImage(named: DesignSystemConstants.noIconImage)
-            }
-        }
+    func showMessage(_ message: String) {
+        activityLoader?.dismiss()
+        alertPresenter?.show(
+            with: AlertModel(
+                title: NSLocalizedString("WeatherListViewController.alertController.title", comment: ""),
+                message: message,
+                firstButton: NSLocalizedString("WeatherListViewController.alertController.errorClose", comment: ""),
+                secondButton: nil,
+                firstCompletion: { },
+                secondCompletion: { }
+            ), style: .default
+        )
+    }
+
+    func showForecasts(_ forecasts: [[DayForecast]]) {
+        activityLoader?.dismiss()
+        self.dayForecasts = forecasts
     }
 }

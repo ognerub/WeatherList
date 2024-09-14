@@ -1,9 +1,10 @@
 import Foundation
+import RealmSwift
 
 protocol WeatherListInteractorInputProtocol: AnyObject {
     var presenter: WeatherListInteractorOutputProtocol? { get set }
     // PRESENTER -> INTERACTOR
-    func retrieveWeatherEntitiesWithRefresh(_ bool: Bool)
+    func retrieveWeatherEntitiesWithRefresh(_ isRefresh: Bool)
     func retrieveGeoLocationUsing(search: String)
     func saveWeatherEntity(_ weatherEntity: WeatherEntity)
     func deleteWeatherEntity(_ weatherEntity: WeatherEntity)
@@ -21,28 +22,29 @@ final class WeatherListInteractor: WeatherListInteractorInputProtocol {
     lazy var geoLocationService = GeoLocationService(urlSession: urlSession, builder: urlBuilder)
     lazy var weatherService = WeatherService(urlSession: urlSession, builder: urlBuilder)
     weak var presenter: WeatherListInteractorOutputProtocol?
+    private let weatherEntitiesStore: WeatherEntitiesStoreProtocol
     private let urlSession = URLSession.shared
     private let urlBuilder = URLRequestBuilder()
-    private var weatherEntitiesStore = WeatherEntitiesStore.shared
     private var weatherEntities: [WeatherEntity] {
-        return weatherEntitiesStore.weatherEntities
+        return weatherEntitiesStore.getEntitiesFromRealm().reversed()
     }
 
-    func retrieveWeatherEntitiesWithRefresh(_ bool: Bool) {
-        if bool && weatherEntities.count > 0 {
-            weatherService.fetchWeatherFor(entities: weatherEntities) { result in
+    init(weatherEntitiesStore: WeatherEntitiesStoreProtocol) {
+        self.weatherEntitiesStore = weatherEntitiesStore
+    }
+
+    func retrieveWeatherEntitiesWithRefresh(_ isRefresh: Bool) {
+        if isRefresh {
+            weatherService.fetchWeatherFor(entities: weatherEntities, completion: { result in
                 switch result {
                 case .success(let result):
-                    if result.count > 0 {
-                        self.weatherEntitiesStore.reloadWeatherEntities(result)
-                        self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
-                        self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.successRefresh", comment: ""))
-                    }
+                    self.weatherEntitiesStore.reloadWeatherEntities(result)
+                    self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
+                    self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.successRefresh", comment: ""))
                 case .failure(_):
-                    //self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
                     self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.errorRefresh", comment: ""))
                 }
-            }
+            })
         } else {
             self.presenter?.didRetrieveWeatherEntities(self.weatherEntities)
         }
