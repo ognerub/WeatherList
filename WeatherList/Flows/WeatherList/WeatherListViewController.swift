@@ -31,7 +31,7 @@ final class WeatherListViewController: UIViewController {
         search.searchBar.placeholder = NSLocalizedString("WeatherListViewController.searchController.placeholder", comment: "")
         return search
     }()
-    lazy var verticalStack: UIStackView = {
+    lazy var infoStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [infoImageView,infoLabel])
         stack.axis = .vertical
         stack.alignment = .fill
@@ -58,19 +58,18 @@ final class WeatherListViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    lazy var refreshControl: UIRefreshControl = {        
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        return refreshControl
+    }()
+
     private var alertController: UIAlertController?
     private var alertPresenter: AlertPresenterProtocol?
     private var activityLoader: UIBlockingProgressHUD?
     private var weatherEntities: [WeatherEntity] = [] {
         didSet {
-            if weatherEntities.isEmpty {
-                addInfoStack()
-                updateButton.isEnabled = false
-            } else {
-                verticalStack.removeFromSuperview()
-                updateButton.isEnabled = true
-            }
-            tableView.reloadData()
+            updateUI()
         }
     }
     // MARK: Life cycle
@@ -89,10 +88,10 @@ final class WeatherListViewController: UIViewController {
     }
     // MARK: Methods
     private func addInfoStack() {
-        view.addSubview(verticalStack)
+        view.addSubview(infoStack)
         NSLayoutConstraint.activate([
-            verticalStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            verticalStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            infoStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            infoStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             infoImageView.heightAnchor.constraint(equalToConstant: DesignSystemConstants.weatherCellSize)
         ])
     }
@@ -102,6 +101,10 @@ final class WeatherListViewController: UIViewController {
         navigationItem.leftBarButtonItem = addButton
         navigationItem.searchController = searchController
         navigationItem.searchController?.searchBar.delegate = self
+        setupTableView()
+    }
+
+    private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
@@ -111,7 +114,22 @@ final class WeatherListViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        tableView.addSubview(self.refreshControl)
         tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: CustomTableViewCell.reuseIdentifier)
+    }
+
+    private func updateUI() {
+        if weatherEntities.isEmpty {
+            addInfoStack()
+            tableView.removeFromSuperview()
+            updateButton.isEnabled = false
+        } else {
+            infoStack.removeFromSuperview()
+            setupTableView()
+            updateButton.isEnabled = true
+        }
+        tableView.reloadData()
+        refreshControl.endRefreshing()
     }
 
     @objc func updateButtonPressed() {
@@ -121,6 +139,11 @@ final class WeatherListViewController: UIViewController {
 
     @objc func addButtonPressed() {
         searchController.searchBar.becomeFirstResponder()
+    }
+
+    @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
+        activityLoader?.show()
+        self.presenter?.startUpdateDataWithRefresh(true)
     }
 }
 
@@ -140,10 +163,9 @@ extension WeatherListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         let weatherEntity = weatherEntities[indexPath.row]
-        let entityTemp = Int(weatherEntity.temp)
         tableViewCell.configureCell(
             with: weatherEntity.title,
-            subtitle: entityTemp > 0 ? "+ \(entityTemp)" : "\(entityTemp)"
+            subtitle: weatherEntity.temp
         )
         let url = "\(NetworkConstants.imageUrl)\(weatherEntities[indexPath.row].icon)@2x.png"
         CustomTableViewCell.downloadImageFor(imageView: tableViewCell.weatherImageView, from: url)

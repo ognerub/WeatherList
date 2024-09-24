@@ -35,7 +35,8 @@ final class WeatherListInteractor: WeatherListInteractorInputProtocol {
 
     func retrieveWeatherEntitiesWithRefresh(_ isRefresh: Bool) {
         if isRefresh {
-            weatherService.fetchWeatherFor(entities: weatherEntities, completion: { result in
+            weatherService.fetchWeatherFor(entities: weatherEntities, completion: { [weak self] result in
+                guard let self else { return }
                 switch result {
                 case .success(let result):
                     self.weatherEntitiesStore.reloadWeatherEntities(result)
@@ -66,9 +67,7 @@ final class WeatherListInteractor: WeatherListInteractorInputProtocol {
             case .success(let result):
                 if result.count > 0 {
                     let element = result[0]
-                    let lat = String(element.lat)
-                    let lon = String(element.lon)
-                    self.fetchSearched(lat: lat, lon: lon)
+                    self.fetchSearched(element: element)
                 } else {
                     self.presenter?.showAlert(message: NSLocalizedString("WeatherListInteractor.alertController.errorName", comment: ""))
                 }
@@ -78,8 +77,8 @@ final class WeatherListInteractor: WeatherListInteractorInputProtocol {
         }
     }
 
-    private func fetchSearched(lat: String, lon: String) {
-        weatherService.fetchWeatherFor(lat: lat, lon: lon) { result in
+    private func fetchSearched(element: GeoLocationResponse) {
+        weatherService.fetchWeatherFor(element: element) { result in
             switch result {
             case .success(let entity):
                 self.saveWeatherEntity(entity)

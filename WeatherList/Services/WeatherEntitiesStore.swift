@@ -35,7 +35,9 @@ final class WeatherEntitiesStore: WeatherEntitiesStoreProtocol {
                     lat: value.lat,
                     lon: value.lon,
                     temp: value.temp,
-                    icon: value.icon
+                    icon: value.icon,
+                    locRu: value.locRu,
+                    locEn: value.locEn
                 )
                 return weatherEntity
             }
@@ -105,7 +107,9 @@ final class WeatherEntitiesStore: WeatherEntitiesStoreProtocol {
             lat: entity.lat,
             lon: entity.lon,
             temp: entity.temp,
-            icon: entity.icon
+            icon: entity.icon,
+            locRu: entity.locRu,
+            locEn: entity.locEn
         )
     }
 }

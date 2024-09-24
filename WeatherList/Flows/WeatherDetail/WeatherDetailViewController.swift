@@ -179,11 +179,11 @@ extension WeatherDetailViewController: UITableViewDataSource {
 
     private func configure(cell: CustomTableViewCell, for indexPath: IndexPath) {
         let weatherForecast = dayForecasts[indexPath.section][indexPath.row]
-        let entityForecast = Int(weatherForecast.temp)
         let entityDate = String(dateFormatter.getString(from: weatherForecast.date).suffix(5))
+        let entityTemp = weatherForecast.temp
         cell.configureCell(
             with: entityDate,
-            subtitle: entityForecast > 0 ? "+ \(entityForecast)" : "\(entityForecast)"
+            subtitle: entityTemp
         )
         let url = "\(NetworkConstants.imageUrl)\(weatherForecast.icon)@2x.png"
         CustomTableViewCell.downloadImageFor(imageView: cell.weatherImageView, from: url)
@@ -196,8 +196,7 @@ extension WeatherDetailViewController: WeatherDetailViewProtocol {
     func showWeather(_ entity: WeatherEntity) {
         weatherEntity = entity
         titleLabel.text = entity.title
-        let entityTemp = Int(entity.temp)
-        subtitleLabel.text = entityTemp > 0 ? "+ \(entityTemp)" : "\(entityTemp)"
+        subtitleLabel.text = entity.temp
         let url = "\(NetworkConstants.imageUrl)\(entity.icon)@2x.png"
         CustomTableViewCell.downloadImageFor(imageView: weatherImageView, from: url)
     }

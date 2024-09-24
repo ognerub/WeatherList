@@ -7,7 +7,7 @@ struct ForecastEntity {
 }
 
 struct DayForecast {
-    let temp: Double
+    let temp: String
     let date: String
     let icon: String
 }

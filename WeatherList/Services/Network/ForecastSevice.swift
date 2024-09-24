@@ -45,8 +45,9 @@ final class ForecastService: ForecastServiceProtocol {
                     id: UUID(),
                     title: result.city.name,
                     forecast: result.list.compactMap { list in
-                        DayForecast(
-                            temp: (list.main.temp - 273.15).rounded(),
+                        let temp = Int((list.main.temp - 273.15).rounded())
+                        return DayForecast(
+                            temp: temp > 0 ? "+ \(temp)" : "\(temp)",
                             date: list.dtTxt,
                             icon: list.weather.compactMap { weather in
                                 return weather.icon
