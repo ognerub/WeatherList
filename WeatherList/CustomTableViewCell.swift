@@ -14,6 +14,7 @@ final class CustomTableViewCell: UITableViewCell {
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(named: DesignSystemConstants.customOrangeColor)
+        label.numberOfLines = 2
         label.font = UIFont.systemFont(ofSize: DesignSystemConstants.textTitleSize, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -82,14 +83,15 @@ final class CustomTableViewCell: UITableViewCell {
             roundedView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             roundedView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: DesignSystemConstants.standartPadding),
             roundedView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -DesignSystemConstants.standartPadding),
-            titleLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: roundedView.centerYAnchor),
             titleLabel.leadingAnchor.constraint(equalTo: roundedView.leadingAnchor, constant: DesignSystemConstants.standartPadding),
             weatherImageView.trailingAnchor.constraint(equalTo: roundedView.trailingAnchor),
             weatherImageView.centerYAnchor.constraint(equalTo: roundedView.topAnchor),
             weatherImageView.widthAnchor.constraint(equalToConstant: DesignSystemConstants.weatherCellSize),
             weatherImageView.heightAnchor.constraint(equalToConstant: DesignSystemConstants.weatherCellSize),
             subtitleLabel.centerXAnchor.constraint(equalTo: weatherImageView.centerXAnchor),
-            subtitleLabel.topAnchor.constraint(equalTo: self.bottomAnchor, constant: -DesignSystemConstants.standartPadding * 2)
+            subtitleLabel.topAnchor.constraint(equalTo: self.bottomAnchor, constant: -DesignSystemConstants.standartPadding * 2),
+            titleLabel.trailingAnchor.constraint(equalTo: weatherImageView.leadingAnchor, constant: -DesignSystemConstants.standartPadding)
         ])
     }
 }

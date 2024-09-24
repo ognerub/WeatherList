@@ -10,16 +10,12 @@
 
 Стек: #Swift, #UIKit, #Kingfisher, #TableView #URLSession, #API, #OpenWeather, #VIPER
 
-[Скринкаст] https://github.com/user-attachments/assets/be82a245-4535-4fbd-99a9-68596b12c89b
+[Скринкаст] https://github.com/user-attachments/assets/59992748-5636-4c6d-9817-b2b839c8e7b9
 
 Скриншоты:
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/243fe13f-179d-42f1-898a-1240189466f5" width="150px"</img>
-    <img src="https://github.com/user-attachments/assets/7049044b-0fe1-47fc-8ef2-43071092dd47" width="150px"</img>
-    <img src="https://github.com/user-attachments/assets/b914dcd5-3ac6-4608-a710-43c9c66da235" width="150px"</img>
-    <img src="https://github.com/user-attachments/assets/b7d263ec-0e87-4f26-a7d9-68c4e037ec6b" width="150px"</img>
+   <img src="https://github.com/user-attachments/assets/08cdf526-4ca8-4dd8-a09e-8c487e653f45" width="150px"</img>
+   <img src="https://github.com/user-attachments/assets/debb27df-e44e-4a4f-b46f-1007f1bfdbc6" width="150px"</img>
+    <img src="https://github.com/user-attachments/assets/63fa4a83-4bc1-4d1d-ad35-a6c4c4e5d3c8" width="150px"</img>
+    <img src="https://github.com/user-attachments/assets/7fc2e917-01bf-43ce-be66-5e756b16b53a" width="150px"</img>
 </div>
-
-
-
-
